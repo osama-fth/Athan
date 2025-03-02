@@ -1,0 +1,42 @@
+</html><!DOCTYPE html>
+<html lang="it" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orari Preghiera - Galliate, Trecate e Novara</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Orari delle Preghiere</h1>
+            <button id="language-toggle" class="language-toggle">العربية</button>
+        </div>
+        
+        <div class="timer-container">
+            <h2 id="timer-label">Tempo rimanente per la prossima preghiera:</h2>
+            <div id="timer" class="timer">00:00:00</div>
+        </div>
+        
+        <div class="date-selector">
+            <label for="date-picker" id="date-label">Seleziona data: </label>
+            <input type="date" id="date-picker">
+            <button id="today-btn" class="today-btn">Oggi</button>
+            <div id="hijri-date" class="hijri-date"></div>
+        </div>
+        
+        <div class="city-selector">
+            <button class="city-btn active" data-city="galliate" data-name-it="Galliate" data-name-ar="غالياتي">Galliate</button>
+            <button class="city-btn" data-city="trecate" data-name-it="Trecate" data-name-ar="تريكاتي">Trecate</button>
+            <button class="city-btn" data-city="novara" data-name-it="Novara" data-name-ar="نوفارا">Novara</button>
+        </div>
+        
+        <div class="prayer-table-container">
+            <h2 id="selected-city">Galliate</h2>
+            <div class="prayer-times"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
