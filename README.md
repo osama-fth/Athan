@@ -7,4 +7,5 @@ The page allows users to see the daily prayer times based on their chosen city, 
 
 API links:  
 https://aladhan.com/prayer-times-api  
-https://aladhan.com/islamic-calendar-api
+https://aladhan.com/islamic-calendar-api  
+https://opencagedata.com/api#quickstart
