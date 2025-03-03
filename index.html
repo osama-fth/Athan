@@ -1,9 +1,9 @@
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orari Preghiera - Galliate, Trecate e Novara</title>
+    <title>Orari Preghiera - Ricerca Città</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,14 +25,17 @@
             <div id="hijri-date" class="hijri-date"></div>
         </div>
         
-        <div class="city-selector">
-            <button class="city-btn active" data-city="galliate" data-name-it="Galliate" data-name-ar="غالياتي">Galliate</button>
-            <button class="city-btn" data-city="trecate" data-name-it="Trecate" data-name-ar="تريكاتي">Trecate</button>
-            <button class="city-btn" data-city="novara" data-name-it="Novara" data-name-ar="نوفارا">Novara</button>
+        <!-- Nuova barra di ricerca città -->
+        <div class="city-search">
+            <div class="search-container">
+                <input type="text" id="city-search-input" placeholder="Cerca una città..." class="search-input">
+                <button id="search-btn" class="search-btn">Cerca</button>
+            </div>
+            <div id="search-results" class="search-results"></div>
         </div>
         
         <div class="prayer-table-container">
-            <h2 id="selected-city">Galliate</h2>
+            <h2 id="selected-city">Cerca una città</h2>
             <div class="prayer-times"></div>
         </div>
     </div>

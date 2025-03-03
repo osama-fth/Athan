@@ -1,9 +1,34 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Coordinate delle città
-    const cities = {
-        'galliate': { lat: 45.4798, lng: 8.6995, name: 'Galliate', nameAr: 'غالياتي' },
-        'trecate': { lat: 45.4324, lng: 8.7389, name: 'Trecate', nameAr: 'تريكاتي' },
-        'novara': { lat: 45.4457, lng: 8.6195, name: 'Novara', nameAr: 'نوفارا' }
+    // Traduzioni delle stringhe dell'interfaccia
+    const translations = {
+        'it': {
+            'title': 'Orari delle Preghiere',
+            'timer': 'Tempo rimanente per la prossima preghiera:',
+            'date': 'Seleziona data:',
+            'today': 'Oggi',
+            'language': 'العربية',
+            'searchPlaceholder': 'Cerca una città...',
+            'search': 'Cerca',
+            'noResults': 'Nessun risultato trovato',
+            'searching': 'Ricerca in corso...',
+            'networkError': 'Errore di rete. Riprova più tardi.',
+            'recentCities': 'Città recenti:',
+            'prayerTimesError': 'Errore nel caricamento degli orari. Riprova più tardi.'
+        },
+        'ar': {
+            'title': 'أوقات الصلاة',
+            'timer': 'الوقت المتبقي للصلاة القادمة:',
+            'date': 'اختر التاريخ:',
+            'today': 'اليوم',
+            'language': 'Italiano',
+            'searchPlaceholder': 'ابحث عن مدينة...',
+            'search': 'بحث',
+            'noResults': 'لم يتم العثور على نتائج',
+            'searching': 'جاري البحث...',
+            'networkError': 'خطأ في الشبكة. حاول مرة أخرى لاحقًا.',
+            'recentCities': 'المدن الأخيرة:',
+            'prayerTimesError': 'خطأ في تحميل أوقات الصلاة. حاول مرة أخرى لاحقًا.'
+        }
     };
     
     // Nomi delle preghiere in italiano e arabo
@@ -26,48 +51,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // Traduzioni delle stringhe dell'interfaccia
-    const translations = {
-        'it': {
-            'title': 'Orari delle Preghiere',
-            'timer': 'Tempo rimanente per la prossima preghiera:',
-            'date': 'Seleziona data:',
-            'today': 'Oggi',
-            'language': 'العربية',
-            'cities': {
-                'galliate': 'Galliate',
-                'trecate': 'Trecate',
-                'novara': 'Novara'
-            }
-        },
-        'ar': {
-            'title': 'أوقات الصلاة',
-            'timer': 'الوقت المتبقي للصلاة القادمة:',
-            'date': 'اختر التاريخ:',
-            'today': 'اليوم',
-            'language': 'Italiano',
-            'cities': {
-                'galliate': 'غالياتي',
-                'trecate': 'تريكاتي',
-                'novara': 'نوفارا'
-            }
-        }
-    };
-    
     // Elementi DOM
     const datePicker = document.getElementById('date-picker');
     const todayButton = document.getElementById('today-btn');
     const hijriDateElement = document.getElementById('hijri-date');
     const selectedCityElement = document.getElementById('selected-city');
     const prayerTimesContainer = document.querySelector('.prayer-times');
-    const cityButtons = document.querySelectorAll('.city-btn');
     const languageToggle = document.getElementById('language-toggle');
     const timerLabel = document.getElementById('timer-label');
     const dateLabel = document.getElementById('date-label');
     const titleElement = document.querySelector('h1');
+    const citySearchInput = document.getElementById('city-search-input');
+    const searchButton = document.getElementById('search-btn');
+    const searchResults = document.getElementById('search-results');
     
     // Stato dell'applicazione
-    let currentCity = 'galliate';
+    let currentCity = null;
     let currentTimings = null;
     let currentLanguage = 'it';
     
@@ -76,14 +75,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const formattedDate = formatDate(today);
     datePicker.value = formattedDate;
     
-    // Carica la data islamica e gli orari di preghiera
+    // Carica la data islamica
     loadHijriDate(formattedDate);
-    loadPrayerTimes(currentCity, formattedDate);
+    
+    // Visualizza città recenti se disponibili
+    loadRecentCities();
+    
+    // Imposta placeholder della ricerca
+    citySearchInput.placeholder = translations[currentLanguage].searchPlaceholder;
+    searchButton.textContent = translations[currentLanguage].search;
     
     // Event listener per il cambio di data
     datePicker.addEventListener('change', function() {
         loadHijriDate(this.value);
-        loadPrayerTimes(currentCity, this.value);
+        if (currentCity) {
+            loadPrayerTimes(currentCity, this.value);
+        }
     });
     
     // Event listener per il pulsante "Oggi"
@@ -92,31 +99,172 @@ document.addEventListener('DOMContentLoaded', function() {
         const formattedToday = formatDate(todayDate);
         datePicker.value = formattedToday;
         loadHijriDate(formattedToday);
-        loadPrayerTimes(currentCity, formattedToday);
-    });
-    
-    // Event listener per i pulsanti delle città
-    cityButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Rimuovi la classe active da tutti i pulsanti
-            cityButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Aggiungi la classe active al pulsante cliccato
-            this.classList.add('active');
-            
-            // Aggiorna la città corrente
-            currentCity = this.dataset.city;
-            updateCityName();
-            
-            // Carica gli orari di preghiera per la nuova città
-            loadPrayerTimes(currentCity, datePicker.value);
-        });
+        if (currentCity) {
+            loadPrayerTimes(currentCity, formattedToday);
+        }
     });
     
     // Event listener per il cambio lingua
     languageToggle.addEventListener('click', function() {
         toggleLanguage();
     });
+    
+    // Event listener per il pulsante di ricerca
+    searchButton.addEventListener('click', function() {
+        searchCity();
+    });
+    
+    // Event listener per l'input di ricerca (ricerca su invio)
+    citySearchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchCity();
+        }
+    });
+    
+    // Funzione per cercare una città
+    function searchCity() {
+        const searchQuery = citySearchInput.value.trim();
+        
+        if (searchQuery.length < 3) {
+            return;
+        }
+        
+        // Mostra il risultato della ricerca
+        searchResults.innerHTML = `<div class="search-result-item">${translations[currentLanguage].searching}</div>`;
+        searchResults.style.display = 'block';
+        
+        // Utilizziamo l'API di Nominatim per cercare la città
+        const apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`;
+        
+        fetch(apiUrl, {
+            headers: {
+                'Accept-Language': currentLanguage === 'it' ? 'it' : 'ar'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                // Visualizza i risultati
+                searchResults.innerHTML = '';
+                
+                data.forEach(place => {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('search-result-item');
+                    resultItem.textContent = place.display_name;
+                    
+                    resultItem.addEventListener('click', function() {
+                        // Seleziona la città e carica gli orari
+                        selectCity({
+                            name: place.display_name.split(',')[0],
+                            nameAr: place.display_name.split(',')[0], // Utilizziamo lo stesso nome per ora
+                            lat: place.lat,
+                            lng: place.lon
+                        });
+                        
+                        // Nascondi i risultati
+                        searchResults.style.display = 'none';
+                    });
+                    
+                    searchResults.appendChild(resultItem);
+                });
+            } else {
+                searchResults.innerHTML = `<div class="search-result-item">${translations[currentLanguage].noResults}</div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Errore nella ricerca:', error);
+            searchResults.innerHTML = `<div class="search-result-item">${translations[currentLanguage].networkError}</div>`;
+        });
+    }
+    
+    // Funzione per selezionare una città
+    function selectCity(city) {
+        currentCity = city;
+        
+        // Aggiorna il nome della città visualizzato
+        updateCityName();
+        
+        // Carica gli orari di preghiera
+        loadPrayerTimes(currentCity, datePicker.value);
+        
+        // Salva la città nelle recenti
+        saveRecentCity(city);
+        
+        // Mostra le città recenti aggiornate
+        loadRecentCities();
+    }
+    
+    // Funzione per salvare una città recente
+    function saveRecentCity(city) {
+        let recentCities = JSON.parse(localStorage.getItem('recentCities')) || [];
+        
+        // Verifica se la città è già presente
+        const existingCityIndex = recentCities.findIndex(c => c.lat === city.lat && c.lng === city.lng);
+        
+        if (existingCityIndex !== -1) {
+            // Rimuovi la città esistente
+            recentCities.splice(existingCityIndex, 1);
+        }
+        
+        // Aggiungi la nuova città all'inizio
+        recentCities.unshift(city);
+        
+        // Limita a massimo 5 città recenti
+        if (recentCities.length > 5) {
+            recentCities = recentCities.slice(0, 5);
+        }
+        
+        // Salva le città recenti
+        localStorage.setItem('recentCities', JSON.stringify(recentCities));
+    }
+    
+    // Funzione per caricare le città recenti
+    function loadRecentCities() {
+        const recentCities = JSON.parse(localStorage.getItem('recentCities')) || [];
+        
+        // Rimuovi il contenitore precedente se esiste
+        const existingContainer = document.querySelector('.recent-cities');
+        if (existingContainer) {
+            existingContainer.remove();
+        }
+        
+        // Se non ci sono città recenti, esci
+        if (recentCities.length === 0) {
+            return;
+        }
+        
+        // Crea il contenitore per le città recenti
+        const recentCitiesContainer = document.createElement('div');
+        recentCitiesContainer.classList.add('recent-cities');
+        
+        // Aggiungi il titolo
+        const title = document.createElement('div');
+        title.classList.add('recent-cities-title');
+        title.textContent = translations[currentLanguage].recentCities;
+        recentCitiesContainer.appendChild(title);
+        
+        // Crea la lista di città recenti
+        const citiesList = document.createElement('div');
+        citiesList.classList.add('recent-cities-list');
+        
+        recentCities.forEach(city => {
+            const cityTag = document.createElement('div');
+            cityTag.classList.add('recent-city-tag');
+            cityTag.textContent = currentLanguage === 'ar' ? city.nameAr : city.name;
+            
+            cityTag.addEventListener('click', function() {
+                selectCity(city);
+            });
+            
+            citiesList.appendChild(cityTag);
+        });
+        
+        recentCitiesContainer.appendChild(citiesList);
+        
+        // Inserisci il contenitore dopo la barra di ricerca
+        const citySearch = document.querySelector('.city-search');
+        citySearch.appendChild(recentCitiesContainer);
+    }
     
     // Funzione per cambiare lingua
     function toggleLanguage() {
@@ -139,31 +287,37 @@ document.addEventListener('DOMContentLoaded', function() {
         dateLabel.textContent = translations[currentLanguage].date;
         todayButton.textContent = translations[currentLanguage].today;
         languageToggle.textContent = translations[currentLanguage].language;
+        citySearchInput.placeholder = translations[currentLanguage].searchPlaceholder;
+        searchButton.textContent = translations[currentLanguage].search;
         
-        // Aggiorna i pulsanti delle città
-        cityButtons.forEach(button => {
-            const cityId = button.dataset.city;
-            button.textContent = translations[currentLanguage].cities[cityId];
-        });
-
         // Aggiorna il nome della città
         updateCityName();
-        loadHijriDate(formattedDate);
         
-
+        // Aggiorna la data islamica
+        loadHijriDate(datePicker.value);
+        
         // Se abbiamo già caricato gli orari, li aggiorniamo con i nuovi nomi
         if (currentTimings) {
             displayPrayerTimes(currentTimings);
         }
+        
+        // Aggiorna la lista delle città recenti
+        loadRecentCities();
+        
         updateNextPrayer();
     }
     
     // Funzione per aggiornare il nome della città in base alla lingua
     function updateCityName() {
+        if (!currentCity) {
+            selectedCityElement.textContent = currentLanguage === 'ar' ? 'ابحث عن مدينة' : 'Cerca una città';
+            return;
+        }
+        
         if (currentLanguage === 'ar') {
-            selectedCityElement.textContent = cities[currentCity].nameAr;
+            selectedCityElement.textContent = currentCity.nameAr;
         } else {
-            selectedCityElement.textContent = cities[currentCity].name;
+            selectedCityElement.textContent = currentCity.name;
         }
     }
     
@@ -184,7 +338,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         hijriDateElement.textContent = `${hijri.day} ${hijri.month.en} ${hijri.year}`;
                     }
-                    // updateNextPrayer()
                 } else {
                     hijriDateElement.textContent = currentLanguage === 'ar' ? 
                         'التاريخ الإسلامي غير متاح' : 
@@ -200,8 +353,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Funzione per caricare gli orari di preghiera
-    function loadPrayerTimes(cityId, date) {
-        const cacheKey = `${cityId}-${date}`;
+    function loadPrayerTimes(city, date) {
+        const cacheKey = `${city.lat}-${city.lng}-${date}`;
         const cachedData = localStorage.getItem(cacheKey);
         
         if (cachedData) {
@@ -222,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Se i dati sono scaduti o non esistono nella cache, facciamo la richiesta all'API
-        const city = cities[cityId];
         const apiUrl = `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=12&isha=90`;
         
         fetch(apiUrl)
@@ -237,15 +389,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateNextPrayer();
             })
             .catch(error => {
-                console.error(`Errore nel caricamento degli orari per ${city.name}:`, error);
+                console.error(`Errore nel caricamento degli orari:`, error);
                 const errorMessage = currentLanguage === 'ar' ? 
                     '<p class="error">خطأ في تحميل أوقات الصلاة. حاول مرة أخرى لاحقًا.</p>' : 
                     '<p class="error">Errore nel caricamento degli orari. Riprova più tardi.</p>';
                 prayerTimesContainer.innerHTML = errorMessage;
             });
     }
-    
-
     
     function displayPrayerTimes(timings) {
         // Svuota il contenitore della tabella prima di inserire i nuovi dati
@@ -280,9 +430,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    
     // Funzione per aggiornare quale è la prossima preghiera e avviare il timer
     function updateNextPrayer() {
+        if (!currentTimings) {
+            return;
+        }
+        
         const now = new Date();
         let nextPrayerTime = null;
         let nextPrayerElement = null;
