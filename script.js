@@ -375,7 +375,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Se i dati sono scaduti o non esistono nella cache, facciamo la richiesta all'API
-        const apiUrl = `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=99&fajr=12&adjustments=0,0,0,0,0,90`;
+        const apiUrl = `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=99&methodSettings=12.5,null,16.5`;
+
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
