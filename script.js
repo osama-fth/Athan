@@ -430,57 +430,130 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Funzione per aggiornare quale è la prossima preghiera e avviare il timer
-    function updateNextPrayer() {
-        if (!currentTimings) {
-            return;
-        }
-        
-        const now = new Date();
-        let nextPrayerTime = null;
-        let nextPrayerElement = null;
-        
-        // Rimuoviamo l'evidenziazione precedente
-        document.querySelectorAll('.next-prayer').forEach(el => {
-            el.classList.remove('next-prayer');
-        });
-        
-        // Controlliamo tutte le preghiere
-        document.querySelectorAll('.prayer-time').forEach(prayerEl => {
-            const prayerTimeStr = prayerEl.dataset.time;
-            const prayerTime = convertToDateTime(prayerTimeStr);
-            
-            if (prayerTime > now) {
-                if (nextPrayerTime === null || prayerTime < nextPrayerTime) {
-                    nextPrayerTime = prayerTime;
-                    nextPrayerElement = prayerEl;
-                }
-            }
-        });
-        
-        // Evidenziamo la prossima preghiera
-        if (nextPrayerElement) {
-            nextPrayerElement.classList.add('next-prayer');
-            startTimer(nextPrayerTime);
-        } else {
-            // Se non c'è una prossima preghiera oggi, dobbiamo caricare i dati di domani
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowFormatted = formatDate(tomorrow);
-            datePicker.value = tomorrowFormatted;
-            
-            loadHijriDate(tomorrowFormatted);
-            loadPrayerTimes(currentCity, tomorrowFormatted);
-        }
+    // This function needs to be modified to handle the next day's Fajr prayer
+function updateNextPrayer() {
+    if (!currentTimings) {
+        return;
     }
     
-    // Funzione per convertire gli orari in oggetti DateTime
-    function convertToDateTime(timeStr) {
-        const [hour, minute] = timeStr.split(':').map(Number);
-        const date = new Date();
-        date.setHours(hour, minute, 0, 0);
-        return date;
+    const now = new Date();
+    let nextPrayerTime = null;
+    let nextPrayerElement = null;
+    
+    // Rimuoviamo l'evidenziazione precedente
+    document.querySelectorAll('.next-prayer').forEach(el => {
+        el.classList.remove('next-prayer');
+    });
+    
+    // Controlliamo tutte le preghiere
+    document.querySelectorAll('.prayer-time').forEach(prayerEl => {
+        const prayerTimeStr = prayerEl.dataset.time;
+        const prayerTime = convertToDateTime(prayerTimeStr);
+        
+        if (prayerTime > now) {
+            if (nextPrayerTime === null || prayerTime < nextPrayerTime) {
+                nextPrayerTime = prayerTime;
+                nextPrayerElement = prayerEl;
+            }
+        }
+    });
+    
+    // Evidenziamo la prossima preghiera
+    if (nextPrayerElement) {
+        nextPrayerElement.classList.add('next-prayer');
+        startTimer(nextPrayerTime);
+    } else {
+        // Se non c'è una prossima preghiera oggi (dopo Isha), carichiamo i dati di domani
+        // e impostiamo il timer per puntare al Fajr del giorno successivo
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowFormatted = formatDate(tomorrow);
+        
+        // Carica gli orari di domani ma non cambiare la data visibile all'utente
+        const currentDate = datePicker.value;
+        loadFajrForNextDay(currentCity, tomorrowFormatted, currentDate);
     }
+}
+
+// Nuova funzione per caricare solo il Fajr del giorno successivo e configurare il timer
+function loadFajrForNextDay(city, nextDayDate, currentDate) {
+    if (!city) return;
+    
+    const cacheKey = `${city.lat}-${city.lng}-${nextDayDate}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    
+    if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        const nextDayFajrTime = parsedData.timings.Fajr;
+        setupNextDayFajrTimer(nextDayFajrTime);
+        return;
+    }
+    
+    // Se i dati non sono in cache, facciamo la richiesta all'API
+    const apiUrl = `https://api.aladhan.com/v1/timings/${nextDayDate}?latitude=${city.lat}&longitude=${city.lng}&method=12&isha=90`;
+    
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Salviamo i dati in cache
+            data.data.timestamp = new Date().toISOString();
+            localStorage.setItem(cacheKey, JSON.stringify(data.data));
+            
+            // Configura il timer per il Fajr del giorno successivo
+            const nextDayFajrTime = data.data.timings.Fajr;
+            setupNextDayFajrTimer(nextDayFajrTime);
+        })
+        .catch(error => {
+            console.error(`Errore nel caricamento degli orari del giorno successivo:`, error);
+            document.getElementById('timer').textContent = '--:--:--';
+        });
+}
+
+// Configura il timer per il Fajr del giorno successivo
+function setupNextDayFajrTimer(fajrTimeStr) {
+    // Crea la data di domani
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Imposta l'orario del Fajr per domani
+    const [fajrHour, fajrMinute] = fajrTimeStr.split(':').map(Number);
+    tomorrow.setHours(fajrHour, fajrMinute, 0, 0);
+    
+    // Avvia il timer
+    startTimer(tomorrow);
+    
+    // Aggiunge una classe speciale per indicare che stiamo puntando al Fajr di domani
+    document.querySelectorAll('.prayer-time').forEach(el => {
+        if (el.dataset.prayer === 'Fajr') {
+            el.classList.add('next-prayer');
+            el.classList.add('next-day-prayer');
+        }
+    });
+    
+    // Aggiorna l'etichetta del timer per indicare che ci riferiamo al giorno successivo
+    const timerLabel = document.getElementById('timer-label');
+    if (currentLanguage === 'ar') {
+        timerLabel.textContent = 'الوقت المتبقي لصلاة الفجر (غدا):';
+    } else {
+        timerLabel.textContent = 'Tempo rimanente per Fajr (domani):';
+    }
+}
+
+// Modifica anche la funzione convertToDateTime per gestire il cambio di giorno
+function convertToDateTime(timeStr) {
+    const [hour, minute] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hour, minute, 0, 0);
+    
+    // Se l'orario è già passato oggi, assumiamo che sia per domani
+    const now = new Date();
+    if (date < now) {
+        // Teniamo l'ora e i minuti, ma aggiungiamo un giorno
+        date.setDate(date.getDate() + 1);
+    }
+    
+    return date;
+}
     
     // Funzione per avviare il timer
     function startTimer(nextPrayerTime) {
