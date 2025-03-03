@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const [year, month, day] = gregorianDate.split('-');
         
         // Utilizziamo l'API aladhan.com per ottenere la data islamica
-        const apiUrl = `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=99&fajr=12&isha=90`;
+        const apiUrl = `https://api.aladhan.com/v1/gToH/${day}-${month}-${year}`;
         
         fetch(apiUrl)
             .then(response => response.json())
@@ -375,8 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Se i dati sono scaduti o non esistono nella cache, facciamo la richiesta all'API
-        const apiUrl = `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=12&isha=90`;
-        
+        const apiUrl = `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=99&fajr=12&isha=90`;
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
