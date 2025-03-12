@@ -486,3 +486,28 @@ h2 {
         background-color: #f0f0f0;
     }
 }
+
+.recent-cities-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+    padding: 0 15px;
+}
+
+.city-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 5px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.city-button:hover {
+    background-color: #e0e0e0;
+}
+
+.rtl .recent-cities-buttons {
+    direction: rtl;
+}

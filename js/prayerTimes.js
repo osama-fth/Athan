@@ -1,15 +1,19 @@
 export function loadPrayerTimes(city, date) {
-    const cacheKey = `${city.lat}-${city.lng}-${date}`;
+    const cacheKey = `prayerTimes-${city.lat}-${city.lng}-${date}`;
     const cachedData = localStorage.getItem(cacheKey);
     
     if (cachedData) {
         const parsedData = JSON.parse(cachedData);
         const cacheDate = new Date(parsedData.timestamp);
         const now = new Date();
-        const isCacheExpired = (now - cacheDate) > (24 * 60 * 60 * 1000);
         
-        if (!isCacheExpired) {
+        // Verifica se è passata la mezzanotte
+        if (cacheDate.getDate() === now.getDate() && 
+            cacheDate.getMonth() === now.getMonth() && 
+            cacheDate.getFullYear() === now.getFullYear()) {
             return Promise.resolve(parsedData.timings);
+        } else {
+            localStorage.removeItem(cacheKey);
         }
     }
     
@@ -18,8 +22,11 @@ export function loadPrayerTimes(city, date) {
     return fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            data.data.timestamp = new Date().toISOString();
-            localStorage.setItem(cacheKey, JSON.stringify(data.data));
+            const cacheData = {
+                timings: data.data.timings,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem(cacheKey, JSON.stringify(cacheData));
             return data.data.timings;
         });
 }

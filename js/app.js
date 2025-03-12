@@ -1,6 +1,6 @@
 import { translations, prayerNames } from './translations.js';
 import { formatDate, padZero, loadHijriDate, convertToDateTime } from './dateUtils.js';
-import { searchCity, saveRecentCity, loadRecentCities } from './citySearch.js';
+import { searchCity, saveRecentCity, loadRecentCities, saveLastSelectedCity, loadLastSelectedCity } from './citySearch.js';
 import { loadPrayerTimes, displayPrayerTimes } from './prayerTimes.js';
 
 let state = {
@@ -27,18 +27,33 @@ function initializeApp() {
         citySearchInput: document.getElementById('city-search-input'),
         searchButton: document.getElementById('search-btn'),
         searchResults: document.getElementById('search-results'),
-        timerElement: document.getElementById('timer') // Aggiungi questo elemento
+        timerElement: document.getElementById('timer'), // Aggiungi questo elemento
+        recentCitiesContainer: document.createElement('div')
     };
+
+    // Aggiungi il container delle città recenti dopo la barra di ricerca
+    elements.recentCitiesContainer.className = 'recent-cities-buttons';
+    elements.citySearchInput.parentElement.parentElement.appendChild(elements.recentCitiesContainer);
 
     // Inizializzazione
     const today = new Date();
     elements.datePicker.value = formatDate(today);
     loadHijriDate(elements.datePicker.value, state.currentLanguage);
+    
+    // Carica l'ultima città selezionata
+    const lastCity = loadLastSelectedCity();
+    if (lastCity) {
+        selectCity(lastCity, elements);
+    }
+    
     loadRecentCities();
     updateInterface(elements);
 
     // Event Listeners
     setupEventListeners(elements);
+
+    // Aggiorna i pulsanti delle città recenti
+    updateRecentCitiesButtons(elements);
 }
 
 function setupEventListeners(elements) {
@@ -132,6 +147,9 @@ function selectCity(city, elements) {
     state.currentCity = city;
     updateCityName(elements);
     
+    // Salva l'ultima città selezionata
+    saveLastSelectedCity(city);
+    
     loadPrayerTimes(city, elements.datePicker.value)
         .then(timings => {
             state.currentTimings = timings;
@@ -142,6 +160,10 @@ function selectCity(city, elements) {
     saveRecentCity(city);
     loadRecentCities();
     elements.searchResults.style.display = 'none';
+    elements.citySearchInput.value = ''; // Pulisci il campo di ricerca
+
+    // Aggiorna i pulsanti delle città recenti dopo la selezione
+    updateRecentCitiesButtons(elements);
 }
 
 function updateInterface(elements) {
@@ -171,6 +193,9 @@ function toggleLanguage(elements) {
     
     loadRecentCities();
     updateNextPrayer(state, elements);
+
+    // Aggiorna i pulsanti delle città quando si cambia lingua
+    updateRecentCitiesButtons(elements);
 }
 
 function updateCityName(elements) {
@@ -270,6 +295,19 @@ function highlightNextPrayer(nextPrayer, elements) {
     if (nextPrayerElement) {
         nextPrayerElement.classList.add('next-prayer');
     }
+}
+
+function updateRecentCitiesButtons(elements) {
+    const recentCities = loadRecentCities();
+    elements.recentCitiesContainer.innerHTML = '';
+
+    recentCities.forEach(city => {
+        const button = document.createElement('button');
+        button.className = 'city-button';
+        button.textContent = state.currentLanguage === 'ar' ? city.nameAr : city.name;
+        button.addEventListener('click', () => selectCity(city, elements));
+        elements.recentCitiesContainer.appendChild(button);
+    });
 }
 
 // Inizializza l'applicazione quando il DOM è pronto
