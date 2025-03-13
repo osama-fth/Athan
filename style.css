@@ -548,3 +548,20 @@ h2 {
         font-size: 0.9rem;
     }
 }
+
+/* Animazioni */
+@keyframes fadeInOut {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+.fade-update {
+    animation: fadeInOut 0.8s ease-in-out;
+}
+
+/* Aggiungi la transizione base agli elementi che verranno aggiornati */
+.prayer-times, 
+.hijri-date {
+    transition: opacity 0.3s ease-in-out;
+}

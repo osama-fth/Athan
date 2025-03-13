@@ -59,6 +59,10 @@ function initializeApp() {
 function setupEventListeners(elements) {
     // Data
     elements.datePicker.addEventListener('change', function() {
+        // Aggiungi classe per animazione
+        elements.prayerTimesContainer.classList.add('fade-update');
+        elements.hijriDateElement.classList.add('fade-update');
+        
         loadHijriDate(this.value, state.currentLanguage);
         if (state.currentCity) {
             loadPrayerTimes(state.currentCity, this.value)
@@ -68,14 +72,24 @@ function setupEventListeners(elements) {
                     updateNextPrayer(state, elements);
                 });
         }
+        
+        // Rimuovi la classe dopo l'animazione
+        setTimeout(() => {
+            elements.prayerTimesContainer.classList.remove('fade-update');
+            elements.hijriDateElement.classList.remove('fade-update');
+        }, 800);
     });
 
-    // Pulsante Oggi
+    // Stesso per il pulsante Oggi
     elements.todayButton.addEventListener('click', () => {
+        elements.prayerTimesContainer.classList.add('fade-update');
+        elements.hijriDateElement.classList.add('fade-update');
+        
         const todayDate = new Date();
         const formattedToday = formatDate(todayDate);
         elements.datePicker.value = formattedToday;
         loadHijriDate(formattedToday, state.currentLanguage);
+        
         if (state.currentCity) {
             loadPrayerTimes(state.currentCity, formattedToday)
                 .then(timings => {
@@ -84,8 +98,13 @@ function setupEventListeners(elements) {
                     updateNextPrayer(state, elements);
                 });
         }
+        
+        setTimeout(() => {
+            elements.prayerTimesContainer.classList.remove('fade-update');
+            elements.hijriDateElement.classList.remove('fade-update');
+        }, 800);
     });
-
+    
     // Cambio lingua
     elements.languageToggle.addEventListener('click', () => {
         toggleLanguage(elements);
