@@ -29,7 +29,7 @@ export function loadHijriDate(gregorianDate, currentLanguage) {
 export function convertToDateTime(timeStr) {
     const [hours, minutes] = timeStr.split(':').map(Number);
     const now = new Date();
-    const prayerTime = new Date(
+    return new Date(
         now.getFullYear(),
         now.getMonth(),
         now.getDate(),
@@ -37,6 +37,4 @@ export function convertToDateTime(timeStr) {
         minutes,
         0
     );
-    
-    return prayerTime;
 }

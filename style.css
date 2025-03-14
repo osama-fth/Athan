@@ -561,7 +561,22 @@ h2 {
 }
 
 /* Aggiungi la transizione base agli elementi che verranno aggiornati */
-.prayer-times, 
+.prayer-times,
+.local-time,
 .hijri-date {
     transition: opacity 0.3s ease-in-out;
+}
+
+/* Aggiungi questo al tuo file style.css */
+.local-time {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 10px 0 20px;
+    
+}
+
+.rtl .local-time {
+    direction: ltr; /* Mantiene il formato dell'ora anche in arabo */
 }

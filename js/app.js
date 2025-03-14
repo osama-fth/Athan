@@ -3,13 +3,16 @@ import { formatDate, padZero, loadHijriDate, convertToDateTime } from './dateUti
 import { searchCity, saveRecentCity, loadRecentCities, saveLastSelectedCity, loadLastSelectedCity } from './citySearch.js';
 import { loadPrayerTimes, displayPrayerTimes } from './prayerTimes.js';
 
+// Aggiungi al tuo stato
 let state = {
     currentCity: null,
     currentTimings: null,
     currentLanguage: 'it',
     timerInterval: null,
     nextPrayer: null,
-    nextPrayerTime: null
+    nextPrayerTime: null,
+    localTimeInterval: null, // Per il nuovo intervallo dell'orologio locale
+    cityTimezoneOffset: 0 // Per memorizzare l'offset del fuso orario
 };
 
 function initializeApp() {
@@ -28,6 +31,7 @@ function initializeApp() {
         searchButton: document.getElementById('search-btn'),
         searchResults: document.getElementById('search-results'),
         timerElement: document.getElementById('timer'), // Aggiungi questo elemento
+        localTimeElement: document.getElementById('local-time'),
         recentCitiesContainer: document.createElement('div')
     };
 
@@ -162,9 +166,62 @@ function displaySearchResults(results, elements) {
     });
 }
 
+// Aggiungi questa funzione per calcolare l'offset del fuso orario della città
+function calculateTimezoneOffset(lng) {
+    // Approssimazione: ogni 15° di longitudine = 1 ora
+    return Math.round(lng / 15) * 60 * 60 * 1000; // Converti in millisecondi
+}
+
+// Funzione per aggiornare l'ora locale della città
+function updateLocalTime(city) {
+    const localTimeElement = document.getElementById('local-time');
+    
+    if (!city) {
+        localTimeElement.textContent = '--:--:--';
+        return null;
+    }
+    
+    // Calcola l'offset del fuso orario della città
+    const cityOffset = calculateTimezoneOffset(city.lng);
+    state.cityTimezoneOffset = cityOffset;
+    
+    function updateTime() {
+        const now = new Date();
+        const localOffset = now.getTimezoneOffset() * 60 * 1000; // Offset locale in millisecondi
+        const utcTime = now.getTime() + localOffset; // Converti in UTC
+        const cityTime = new Date(utcTime + cityOffset); // Applica l'offset della città
+        
+        localTimeElement.textContent = cityTime.toLocaleTimeString('it-IT', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        return cityTime; // Ritorna l'ora della città per altri utilizzi
+    }
+    
+    // Aggiorna subito e poi ogni secondo
+    updateTime();
+    return setInterval(updateTime, 1000);
+}
+
+// Modifica la funzione selectCity 
 function selectCity(city, elements) {
+    // Aggiungi classe per animazione
+    elements.prayerTimesContainer.classList.add('fade-update');
+    elements.hijriDateElement.classList.add('fade-update');
+    elements.localTimeElement.classList.add('fade-update');
+    
     state.currentCity = city;
     updateCityName(elements);
+    
+    // Ferma il vecchio intervallo se esiste
+    if (state.localTimeInterval) {
+        clearInterval(state.localTimeInterval);
+    }
+    
+    // Avvia il nuovo intervallo per l'ora locale
+    state.localTimeInterval = updateLocalTime(city);
     
     // Salva l'ultima città selezionata
     saveLastSelectedCity(city);
@@ -183,6 +240,13 @@ function selectCity(city, elements) {
 
     // Aggiorna i pulsanti delle città recenti dopo la selezione
     updateRecentCitiesButtons(elements);
+    
+    // Rimuovi la classe dopo l'animazione
+    setTimeout(() => {
+        elements.prayerTimesContainer.classList.remove('fade-update');
+        elements.hijriDateElement.classList.remove('fade-update');
+        elements.localTimeElement.classList.remove('fade-update');
+    }, 800);
 }
 
 function updateInterface(elements) {
@@ -225,23 +289,34 @@ function updateCityName(elements) {
     elements.selectedCityElement.textContent = state.currentLanguage === 'ar' ? state.currentCity.nameAr : state.currentCity.name;
 }
 
+// Modifica la funzione updateNextPrayer per usare l'ora locale della città
 function updateNextPrayer(state, elements) {
     if (!state.currentTimings) return;
 
+    // Usa l'ora locale della città invece dell'ora del dispositivo
     const now = new Date();
+    const localOffset = now.getTimezoneOffset() * 60 * 1000;
+    const utcTime = now.getTime() + localOffset;
+    const cityNow = new Date(utcTime + state.cityTimezoneOffset);
+    
     const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
     let nextPrayer = null;
     let nextPrayerTime = null;
 
     // Converti tutti gli orari delle preghiere in oggetti Date
-    const prayerTimes = prayers.map(prayer => ({
-        name: prayer,
-        time: convertToDateTime(state.currentTimings[prayer])
-    }));
+    const prayerTimes = prayers.map(prayer => {
+        const prayerTimeObj = convertToDateTime(state.currentTimings[prayer]);
+        // Applica lo stesso offset della città
+        const prayerTimestamp = prayerTimeObj.getTime();
+        return {
+            name: prayer,
+            time: prayerTimeObj
+        };
+    });
 
-    // Trova la prossima preghiera
+    // Trova la prossima preghiera usando l'ora locale della città
     for (const prayer of prayerTimes) {
-        if (prayer.time > now) {
+        if (prayer.time > cityNow) {
             nextPrayer = prayer.name;
             nextPrayerTime = prayer.time;
             break;
@@ -262,13 +337,9 @@ function updateNextPrayer(state, elements) {
     // Aggiorna l'interfaccia
     updateTimer(nextPrayerTime, elements);
     highlightNextPrayer(nextPrayer, elements);
-
-    // Debug - rimuovi dopo il test
-    console.log('Ora corrente:', now.toLocaleTimeString());
-    console.log('Prossima preghiera:', nextPrayer);
-    console.log('Orario prossima preghiera:', nextPrayerTime.toLocaleTimeString());
 }
 
+// Modifica la funzione updateTimer per usare l'ora locale della città
 function updateTimer(nextPrayerTime, elements) {
     // Pulisci il timer esistente se presente
     if (state.timerInterval) {
@@ -277,8 +348,13 @@ function updateTimer(nextPrayerTime, elements) {
 
     // Funzione per aggiornare il display del timer
     function updateDisplay() {
+        // Usa l'ora locale della città invece dell'ora del dispositivo
         const now = new Date();
-        const timeDiff = nextPrayerTime - now;
+        const localOffset = now.getTimezoneOffset() * 60 * 1000;
+        const utcTime = now.getTime() + localOffset;
+        const cityNow = new Date(utcTime + state.cityTimezoneOffset);
+        
+        const timeDiff = nextPrayerTime - cityNow;
 
         if (timeDiff <= 0) {
             clearInterval(state.timerInterval);
