@@ -42,22 +42,15 @@ function initializeApp() {
     // Inizializzazione
     const today = new Date();
     elements.datePicker.value = formatDate(today);
-<<<<<<< HEAD
-=======
     
     // Modifica qui: gestisci la Promise
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
     loadHijriDate(elements.datePicker.value, state.currentLanguage)
         .then(hijriDate => {
             elements.hijriDateElement.textContent = hijriDate;
         })
         .catch(error => {
-<<<<<<< HEAD
-            console.error('Errore nel caricamento della data hijri:', error);
-=======
             console.error('Errore nel caricamento della data Hijri:', error);
             elements.hijriDateElement.textContent = 'Data Hijri non disponibile';
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
         });
     
     // Carica l'ultima città selezionata
@@ -90,24 +83,16 @@ function setupEventListeners(elements) {
         elements.prayerTimesContainer.classList.add('fade-update');
         elements.hijriDateElement.classList.add('fade-update');
         
-<<<<<<< HEAD
-=======
         // Modifica qui: gestisci la Promise
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
         loadHijriDate(this.value, state.currentLanguage)
             .then(hijriDate => {
                 elements.hijriDateElement.textContent = hijriDate;
             })
             .catch(error => {
-<<<<<<< HEAD
-                console.error('Errore nel caricamento della data hijri:', error);
-            });
-=======
                 console.error('Errore nel caricamento della data Hijri:', error);
                 elements.hijriDateElement.textContent = 'Data Hijri non disponibile';
             });
         
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
         if (state.currentCity) {
             loadPrayerTimes(state.currentCity, this.value)
                 .then(timings => {
@@ -132,22 +117,15 @@ function setupEventListeners(elements) {
         const todayDate = new Date();
         const formattedToday = formatDate(todayDate);
         elements.datePicker.value = formattedToday;
-<<<<<<< HEAD
-=======
         
         // Modifica qui: gestisci la Promise
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
         loadHijriDate(formattedToday, state.currentLanguage)
             .then(hijriDate => {
                 elements.hijriDateElement.textContent = hijriDate;
             })
             .catch(error => {
-<<<<<<< HEAD
-                console.error('Errore nel caricamento della data hijri:', error);
-=======
                 console.error('Errore nel caricamento della data Hijri:', error);
                 elements.hijriDateElement.textContent = 'Data Hijri non disponibile';
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
             });
         
         if (state.currentCity) {
@@ -343,22 +321,15 @@ function toggleLanguage(elements) {
     
     updateInterface(elements);
     updateCityName(elements);
-<<<<<<< HEAD
-=======
     
     // Modifica qui: gestisci la Promise
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
     loadHijriDate(elements.datePicker.value, state.currentLanguage)
         .then(hijriDate => {
             elements.hijriDateElement.textContent = hijriDate;
         })
         .catch(error => {
-<<<<<<< HEAD
-            console.error('Errore nel caricamento della data hijri:', error);
-=======
             console.error('Errore nel caricamento della data Hijri:', error);
             elements.hijriDateElement.textContent = 'Data Hijri non disponibile';
->>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
         });
     
     if (state.currentTimings) {
