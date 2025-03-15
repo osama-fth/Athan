@@ -42,7 +42,13 @@ function initializeApp() {
     // Inizializzazione
     const today = new Date();
     elements.datePicker.value = formatDate(today);
-    loadHijriDate(elements.datePicker.value, state.currentLanguage);
+    loadHijriDate(elements.datePicker.value, state.currentLanguage)
+        .then(hijriDate => {
+            elements.hijriDateElement.textContent = hijriDate;
+        })
+        .catch(error => {
+            console.error('Errore nel caricamento della data hijri:', error);
+        });
     
     // Carica l'ultima città selezionata
     const lastCity = loadLastSelectedCity();
@@ -52,6 +58,13 @@ function initializeApp() {
     
     loadRecentCities();
     updateInterface(elements);
+
+    // Assicurati che la pagina inizi con le impostazioni RTL corrette
+    if (state.currentLanguage === 'ar') {
+        document.body.classList.add('rtl');
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.documentElement.setAttribute('lang', 'ar');
+    }
 
     // Event Listeners
     setupEventListeners(elements);
@@ -67,7 +80,13 @@ function setupEventListeners(elements) {
         elements.prayerTimesContainer.classList.add('fade-update');
         elements.hijriDateElement.classList.add('fade-update');
         
-        loadHijriDate(this.value, state.currentLanguage);
+        loadHijriDate(this.value, state.currentLanguage)
+            .then(hijriDate => {
+                elements.hijriDateElement.textContent = hijriDate;
+            })
+            .catch(error => {
+                console.error('Errore nel caricamento della data hijri:', error);
+            });
         if (state.currentCity) {
             loadPrayerTimes(state.currentCity, this.value)
                 .then(timings => {
@@ -92,7 +111,13 @@ function setupEventListeners(elements) {
         const todayDate = new Date();
         const formattedToday = formatDate(todayDate);
         elements.datePicker.value = formattedToday;
-        loadHijriDate(formattedToday, state.currentLanguage);
+        loadHijriDate(formattedToday, state.currentLanguage)
+            .then(hijriDate => {
+                elements.hijriDateElement.textContent = hijriDate;
+            })
+            .catch(error => {
+                console.error('Errore nel caricamento della data hijri:', error);
+            });
         
         if (state.currentCity) {
             loadPrayerTimes(state.currentCity, formattedToday)
@@ -207,6 +232,8 @@ function updateLocalTime(city) {
 
 // Modifica la funzione selectCity 
 function selectCity(city, elements) {
+    console.log(`Selezione città: ${city.name} (${city.lat}, ${city.lng})`);
+    
     // Aggiungi classe per animazione
     elements.prayerTimesContainer.classList.add('fade-update');
     elements.hijriDateElement.classList.add('fade-update');
@@ -222,6 +249,7 @@ function selectCity(city, elements) {
     
     // Avvia il nuovo intervallo per l'ora locale
     state.localTimeInterval = updateLocalTime(city);
+    console.log(`Intervallo orario locale impostato per ${city.name}`);
     
     // Salva l'ultima città selezionata
     saveLastSelectedCity(city);
@@ -229,8 +257,12 @@ function selectCity(city, elements) {
     loadPrayerTimes(city, elements.datePicker.value)
         .then(timings => {
             state.currentTimings = timings;
+            console.log(`Visualizzazione orari preghiera per ${city.name}`);
             displayPrayerTimes(timings, state.currentLanguage, prayerNames, elements.prayerTimesContainer);
             updateNextPrayer(state, elements);
+        })
+        .catch(error => {
+            console.error(`Errore durante il caricamento degli orari per ${city.name}:`, error);
         });
     
     saveRecentCity(city);
@@ -259,16 +291,34 @@ function updateInterface(elements) {
     elements.languageToggle.textContent = translations[state.currentLanguage].language;
 }
 
+// Nel tuo file app.js, funzione toggleLanguage
 function toggleLanguage(elements) {
     state.currentLanguage = state.currentLanguage === 'it' ? 'ar' : 'it';
     
-    document.body.classList.toggle('rtl');
-    document.documentElement.setAttribute('lang', state.currentLanguage);
-    document.documentElement.setAttribute('dir', state.currentLanguage === 'ar' ? 'rtl' : 'ltr');
+    if (state.currentLanguage === 'ar') {
+        // Attiva RTL
+        document.body.classList.add('rtl');
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.documentElement.setAttribute('lang', 'ar');
+    } else {
+        // Disattiva RTL
+        document.body.classList.remove('rtl');
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.documentElement.setAttribute('lang', 'it');
+    }
+    
+    // Forza il reflow per applicare immediatamente i cambiamenti CSS
+    void document.body.offsetHeight;
     
     updateInterface(elements);
     updateCityName(elements);
-    loadHijriDate(elements.datePicker.value, state.currentLanguage);
+    loadHijriDate(elements.datePicker.value, state.currentLanguage)
+        .then(hijriDate => {
+            elements.hijriDateElement.textContent = hijriDate;
+        })
+        .catch(error => {
+            console.error('Errore nel caricamento della data hijri:', error);
+        });
     
     if (state.currentTimings) {
         displayPrayerTimes(state.currentTimings, state.currentLanguage, prayerNames, elements.prayerTimesContainer);
@@ -299,6 +349,8 @@ function updateNextPrayer(state, elements) {
     const utcTime = now.getTime() + localOffset;
     const cityNow = new Date(utcTime + state.cityTimezoneOffset);
     
+    console.log(`Calcolo prossima preghiera - Ora città: ${cityNow.toLocaleTimeString()}`);
+    
     const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
     let nextPrayer = null;
     let nextPrayerTime = null;
@@ -306,8 +358,6 @@ function updateNextPrayer(state, elements) {
     // Converti tutti gli orari delle preghiere in oggetti Date
     const prayerTimes = prayers.map(prayer => {
         const prayerTimeObj = convertToDateTime(state.currentTimings[prayer]);
-        // Applica lo stesso offset della città
-        const prayerTimestamp = prayerTimeObj.getTime();
         return {
             name: prayer,
             time: prayerTimeObj
@@ -328,6 +378,9 @@ function updateNextPrayer(state, elements) {
         nextPrayer = prayers[0];
         nextPrayerTime = convertToDateTime(state.currentTimings[prayers[0]]);
         nextPrayerTime.setDate(nextPrayerTime.getDate() + 1);
+        console.log(`Nessuna altra preghiera oggi, impostata la prima preghiera di domani: ${nextPrayer}`);
+    } else {
+        console.log(`Prossima preghiera: ${nextPrayer} alle ${nextPrayerTime.toLocaleTimeString()}`);
     }
 
     // Aggiorna lo stato

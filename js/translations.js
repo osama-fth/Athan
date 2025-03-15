@@ -4,7 +4,7 @@ export const translations = {
         'timer': 'Tempo rimanente per la prossima preghiera:',
         'date': 'Seleziona data:',
         'today': 'Oggi',
-        'language': 'العربية',
+        'language': 'ar',
         'searchPlaceholder': 'Cerca una città...',
         'search': 'Cerca',
         'noResults': 'Nessun risultato trovato',
@@ -18,7 +18,7 @@ export const translations = {
         'timer': 'الوقت المتبقي للصلاة القادمة:',
         'date': 'اختر التاريخ:',
         'today': 'اليوم',
-        'language': 'Italiano',
+        'language': 'it',
         'searchPlaceholder': 'ابحث عن مدينة...',
         'search': 'بحث',
         'noResults': 'لم يتم العثور على نتائج',
@@ -32,7 +32,7 @@ export const translations = {
 export const prayerNames = {
     'it': {
         'Fajr': 'Fajr',
-        'Sunrise': 'Alba',
+        'Sunrise': 'Shoroq',
         'Dhuhr': 'Dhuhr',
         'Asr': 'Asr',
         'Maghrib': 'Maghrib',
