@@ -106,9 +106,24 @@ h2 {
 /* ============== DATE SELECTOR ============== */
 .date-selector {
     display: flex;
+<<<<<<< HEAD
     flex-direction: column;
+=======
+    flex-direction: row; /* Cambiato da column a row */
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
     align-items: center;
     margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    max-width: 450px; /* Larghezza fissa coerente con search-container */
+    margin: 0 auto 20px; /* Centrato e margine inferiore */
+}
+
+#date-label {
+    margin-right: 8px;
+    white-space: nowrap;
 }
 
 .date-controls-wrapper {
@@ -135,6 +150,12 @@ h2 {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+<<<<<<< HEAD
+=======
+    flex: 1;
+    min-width: 200px;
+    margin-right: 10px; /* Spazio tra il date picker e il pulsante */
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
 }
 
 .today-btn {
@@ -148,10 +169,13 @@ h2 {
     transition: all 0.3s ease;
     width: 80px;
     text-align: center;
+<<<<<<< HEAD
 }
 
 .today-btn:hover, .btn-success:hover {
     background-color: #1abc9c;
+=======
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
 }
 
 .hijri-date {
@@ -167,6 +191,9 @@ h2 {
 /* ============== CITY SEARCH ============== */
 .city-search {
     margin-bottom: 30px;
+    width: 100%;
+    max-width: 450px; /* Stessa larghezza del date-selector */
+    margin: 0 auto 30px; /* Centrato e margine inferiore */
 }
 
 .search-container {
@@ -538,6 +565,7 @@ body.rtl .hijri-date {
         font-size: 2rem;
     }
     
+<<<<<<< HEAD
     /* Date selector */
     .date-controls-wrapper {
         flex-direction: column;
@@ -554,10 +582,26 @@ body.rtl .hijri-date {
     #date-label {
         margin-right: 0;
         margin-bottom: 8px;
+=======
+    /* Date selector responsive modificato */
+    .date-selector {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        max-width: 320px;
+    }
+    
+    #date-label {
+        margin-right: 0;
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: center; /* Aggiungiamo questa riga per centrare il testo */
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
     }
     
     #date-picker {
         width: 100%;
+<<<<<<< HEAD
         margin-bottom: 8px;
     }
     
@@ -570,11 +614,33 @@ body.rtl .hijri-date {
         flex-direction: column;
         width: 100%;
         max-width: 320px;
+=======
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+    
+    .today-btn {
+        width: 100%;
+    }
+    
+    /* Search responsive */
+    .city-search {
+        max-width: 320px;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        gap: 8px;
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
     }
     
     #city-search-input {
         width: 100%;
+<<<<<<< HEAD
         margin-bottom: 8px;
+=======
+        margin-bottom: 0; /* Rimuovi margin bottom */
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
     }
     
     #search-btn {
@@ -612,6 +678,65 @@ body.rtl .hijri-date {
     .rtl #city-search-input {
         text-align: right;
     }
+<<<<<<< HEAD
+=======
+    
+    /* Fix per mantenere tutto centrato anche con cambio lingua */
+    html[dir="rtl"] .date-selector,
+    body.rtl .date-selector,
+    html[dir="rtl"] .city-search,
+    body.rtl .city-search {
+        align-items: center;
+    }
+    
+    html[dir="rtl"] #date-label,
+    body.rtl #date-label {
+        text-align: center; /* Centra anche in modalità RTL */
+        width: 100%;
+    }
+    
+    /* Correggi l'allineamento nei contenitori */
+    html[dir="rtl"] .date-controls-wrapper,
+    body.rtl .date-controls-wrapper,
+    html[dir="rtl"] .date-input-group,
+    body.rtl .date-input-group,
+    html[dir="rtl"] .search-container,
+    body.rtl .search-container {
+        flex-direction: column;
+        align-items: center; /* Cambia da flex-end a center */
+        width: 100%;
+    }
+    
+    /* Correggi l'allineamento per i pulsanti */
+    html[dir="rtl"] #today-btn,
+    body.rtl #today-btn,
+    html[dir="rtl"] #search-btn,
+    body.rtl #search-btn {
+        margin-right: 0;
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* Assicurati che i contenitori principali mantengano la centratura */
+    .date-selector,
+    .city-search {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Correggi le regole conflittuali esistenti */
+    /* Rimuovi queste regole che causano l'allineamento a destra in modalità RTL */
+    .rtl .date-controls-wrapper,
+    .rtl .date-input-group,
+    .rtl .search-container {
+        align-items: center; /* Cambia da flex-end a center */
+    }
+    
+    .rtl #date-label {
+        text-align: center; /* Cambia da right a center */
+    }
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
 }
 
 @media (max-width: 576px) {

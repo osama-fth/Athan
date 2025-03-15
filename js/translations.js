@@ -4,7 +4,11 @@ export const translations = {
         'timer': 'Tempo rimanente per la prossima preghiera:',
         'date': 'Seleziona data:',
         'today': 'Oggi',
+<<<<<<< HEAD
         'language': 'ar',
+=======
+        'language': 'AR',
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
         'searchPlaceholder': 'Cerca una città...',
         'search': 'Cerca',
         'noResults': 'Nessun risultato trovato',
@@ -18,7 +22,11 @@ export const translations = {
         'timer': 'الوقت المتبقي للصلاة القادمة:',
         'date': 'اختر التاريخ:',
         'today': 'اليوم',
+<<<<<<< HEAD
         'language': 'it',
+=======
+        'language': 'IT',
+>>>>>>> ac94c0c (Aggiorna le traduzioni e gestisci le Promise per il caricamento della data Hijri)
         'searchPlaceholder': 'ابحث عن مدينة...',
         'search': 'بحث',
         'noResults': 'لم يتم العثور على نتائج',
