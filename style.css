@@ -363,8 +363,8 @@ h2 {
 /* ============== FOOTER ============== */
 .footer {
     text-align: center;
-    margin-top: 30px;
-    padding: 15px 0;
+    margin-top: 15px;
+    padding: 15px 0 7px 0;
     color: #7f8c8d;
     font-size: 0.5rem;
     border-top: 1px solid #eee;
@@ -519,7 +519,7 @@ body.rtl .hijri-date {
 /* Mobile devices */
 @media (max-width: 576px) {
     .container {
-        padding: 15px 10px;
+        padding: 15px 10px 0 10px;
     }
     
     h1 {
