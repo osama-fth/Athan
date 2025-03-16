@@ -25,16 +25,3 @@ export function loadHijriDate(gregorianDate, currentLanguage) {
             throw new Error('Invalid response');
         });
 }
-
-export function convertToDateTime(timeStr) {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    const now = new Date();
-    return new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        hours,
-        minutes,
-        0
-    );
-}
