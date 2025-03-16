@@ -14,7 +14,7 @@ body {
 .container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px 20px 0px 20px;
 }
 
 /* Utilità per testo */
@@ -106,15 +106,15 @@ h2 {
 /* ============== DATE SELECTOR ============== */
 .date-selector {
     display: flex;
-    flex-direction: row; /* Cambiato da column a row */
+    flex-direction: row; 
     align-items: center;
     margin-bottom: 20px;
     justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
     width: 100%;
-    max-width: 450px; /* Larghezza fissa coerente con search-container */
-    margin: 0 auto 20px; /* Centrato e margine inferiore */
+    max-width: 450px; 
+    margin: 0 auto 20px; 
 }
 
 #date-label {
@@ -148,7 +148,7 @@ h2 {
     font-size: 1rem;
     flex: 1;
     min-width: 200px;
-    margin-right: 10px; /* Spazio tra il date picker e il pulsante */
+    margin-right: 10px;
 }
 
 .today-btn {
@@ -182,8 +182,8 @@ h2 {
 .city-search {
     margin-bottom: 30px;
     width: 100%;
-    max-width: 450px; /* Stessa larghezza del date-selector */
-    margin: 0 auto 30px; /* Centrato e margine inferiore */
+    max-width: 450px; 
+    margin: 0 auto 30px; 
 }
 
 .search-container {
@@ -366,7 +366,7 @@ h2 {
     margin-top: 30px;
     padding: 15px 0;
     color: #7f8c8d;
-    font-size: 1rem;
+    font-size: 0.5rem;
     border-top: 1px solid #eee;
 }
 
@@ -430,7 +430,7 @@ body.rtl #today-btn {
     margin-left: 0;
 }
 
-/* 3. SEARCH CONTAINER RTL - problema principale */
+/* 3. SEARCH CONTAINER RTL */
 html[dir="rtl"] .search-container,
 body.rtl .search-container {
     display: flex;
@@ -567,7 +567,7 @@ body.rtl .hijri-date {
         margin-right: 0;
         margin-bottom: 5px;
         width: 100%;
-        text-align: center; /* Aggiungiamo questa riga per centrare il testo */
+        text-align: center; 
     }
     
     #date-picker {
@@ -592,7 +592,7 @@ body.rtl .hijri-date {
     
     #city-search-input {
         width: 100%;
-        margin-bottom: 0; /* Rimuovi margin bottom */
+        margin-bottom: 0; 
     }
     
     /* RTL specific adaptations */
@@ -637,11 +637,10 @@ body.rtl .hijri-date {
     
     html[dir="rtl"] #date-label,
     body.rtl #date-label {
-        text-align: center; /* Centra anche in modalità RTL */
+        text-align: center; 
         width: 100%;
     }
     
-    /* Correggi l'allineamento nei contenitori */
     html[dir="rtl"] .date-controls-wrapper,
     body.rtl .date-controls-wrapper,
     html[dir="rtl"] .date-input-group,
@@ -649,7 +648,7 @@ body.rtl .hijri-date {
     html[dir="rtl"] .search-container,
     body.rtl .search-container {
         flex-direction: column;
-        align-items: center; /* Cambia da flex-end a center */
+        align-items: center; 
         width: 100%;
     }
     
@@ -664,23 +663,83 @@ body.rtl .hijri-date {
         text-align: center;
     }
     
-    /* Assicurati che i contenitori principali mantengano la centratura */
     .date-selector,
     .city-search {
         margin-left: auto;
         margin-right: auto;
     }
     
-    /* Correggi le regole conflittuali esistenti */
-    /* Rimuovi queste regole che causano l'allineamento a destra in modalità RTL */
     .rtl .date-controls-wrapper,
     .rtl .date-input-group,
     .rtl .search-container {
-        align-items: center; /* Cambia da flex-end a center */
+        align-items: center; 
     }
     
     .rtl #date-label {
-        text-align: center; /* Cambia da right a center */
+        text-align: center; 
+    }
+    
+    .today-btn,
+    .search-btn,
+    html[dir="rtl"] .today-btn,
+    html[dir="rtl"] .search-btn,
+    body.rtl .today-btn,
+    body.rtl .search-btn {
+        width: 100%;
+        text-align: center;
+        margin-right: 0;
+        margin-left: 0;
+    }
+    
+    .date-input-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    #city-search-input,
+    #date-picker {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+        text-align: left;
+    }
+    
+    html[dir="rtl"] #city-search-input,
+    body.rtl #city-search-input {
+        text-align: right;
+    }
+    
+    .date-selector,
+    .city-search,
+    html[dir="rtl"] .date-selector,
+    html[dir="rtl"] .city-search,
+    body.rtl .date-selector,
+    body.rtl .city-search {
+        align-items: center;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 320px;
+    }
+    
+    .rtl .date-controls-wrapper,
+    .rtl .date-input-group,
+    .rtl .search-container {
+        align-items: center;
+    }
+    
+    .rtl #date-label,
+    #date-label {
+        text-align: center;
+        width: 100%;
+        margin-right: 0;
+        margin-left: 0;
+        margin-bottom: 5px;
     }
 }
 
